@@ -1,101 +1,135 @@
-import React from 'react';
-import './Form.css'
+import React, { useEffect, useState } from 'react'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const Forms = () => {
-    const initState = {
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNum: "",
-    };
+const Form = () => {
 
-    const alertState = {
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNum: "",
-    };
+  const initState = {
+    firstName : "",
+    lastName : "",
+    email : "",
+    phNo : ""
+  }
 
-    const focusState = {
-        firstName: false,
-        lastName: false,
-        email: false,
-        phoneNum: false,
-    };
+  const initAlert = {
+    firstName : "",
+    lastName : "",
+    email : "",
+    phNo : ""
+  }
 
-    const [formdata, setFormdata] = React.useState(initState);
-    const [alert, setAlert] = React.useState(alertState);
-    const [focus, setFocus] = React.useState(focusState);
-    const [registrationSuccess, setRegistrationSuccess] = React.useState(false);
+  const focusState = {
+    firstName : false,
+    lastName : false,
+    email : false,
+    phNo : false
+  }
 
-    function handleChange(e) {
-        const { name, value } = e.target;
-        setFormdata((prevdata) => ({ ...prevdata, [name]: value }));
+  const [alert , setAlerts] = useState(initAlert)
+  const [registration , setRegistration] = useState(false)
+  const [data , setData] = useState(initState)
+  const [focus , setfocus] = useState(focusState)
+
+  let handleChange = (e) => {
+    const {name , value} = e.target;
+    setData((prev) => ({...prev , [name]:value}))
+  }
+
+  let handleFocus = (name) =>{
+    let obj = {
+      firstName:false,
+      lastName:false,
+      email:false,
+      phno:false
     }
 
-    function handleFocus(name) {
-        setFocus((prevfocusdata) => ({ ...prevfocusdata, [name]: true }));
+    obj[name] = true
+
+    setfocus(obj)
+  }
+
+  let handleSubmit = (e) =>{
+    e.preventDefault();
+
+    let msgBox = {}
+
+    if (data.firstName == ""){
+      msgBox.firstName = "Please Enter First Name"
+    }else{
+      msgBox.firstName = ""
     }
 
-    function handleSubmit(e) {
-        e.preventDefault();
-        const messageBox = { firstName: "", lastName: "", email: "", phoneNum: "" };
-
-        if (formdata.firstName === "") {
-            messageBox.firstName = "Please enter your first name";
-        }
-
-        if (formdata.lastName === "") {
-            messageBox.lastName = "Please enter your last name";
-        }
-
-        if (formdata.email === "") {
-            messageBox.email = "Please enter your email";
-        }
-
-        if (formdata.phoneNum === "") {
-            messageBox.phoneNum = "Please enter your phone number";
-        }
-
-        setAlert(messageBox);
-
-        if (messageBox.firstName === "" && messageBox.lastName === "" && messageBox.email === "" && messageBox.phoneNum === "") {
-            setRegistrationSuccess(true);
-        }
+    if (data.lastName == ""){
+      msgBox.lastName = "Please Enter Last Name"
+    }else{
+      msgBox.lastName = ""
     }
 
-    return (
-        <>
-            <div>
-                <form onSubmit={handleSubmit}>
-                    <label>
-                        <input type="text" name="firstName" value={formdata.firstName} onChange={handleChange} onFocus={() => handleFocus("firstName")} placeholder="Enter your First Name" />
-                        <div>{alert.firstName}</div>
-                    </label>
-                    <label>
-                        <input type="text" name="lastName" value={formdata.lastName} onChange={handleChange} onFocus={() => handleFocus("lastName")} placeholder="Enter your Last Name" />
-                        <div>{alert.lastName}</div>
-                    </label>
-                    <label>
-                        <input type="text" name="email" value={formdata.email} onChange={handleChange} onFocus={() => handleFocus("email")} placeholder="Enter your email" />
-                        <div>{alert.email}</div>
-                    </label>
-                    <label>
-                        <input type="tel" name="phoneNum" value={formdata.phoneNum} onChange={handleChange} onFocus={() => handleFocus("phoneNum")} placeholder="Enter your Phone Number" />
-                        <div>{alert.phoneNum}</div>
-                    </label>
-                    <input type="submit" value={"Register"} />
-                </form>
-                <div>
-                    {registrationSuccess && (
-                        <div className='registration-success'>
-                            Registration Successful!
-                        </div>
-                    )}
-                </div>
-            </div>
-        </>
-    );
-};
+    if (data.email == ""){
+      msgBox.email = "Please Enter Email"
+    }else{
+      msgBox.email = ""
+    }
 
-export default Forms;
+    if (data.phNo == ""){
+      msgBox.phNo = "Please Enter Phone Number"
+    }else if (data.phNo.length != 10){
+      msgBox.phNo = "Please enter 10 digit phone number"
+    }else{
+      msgBox.phNo = ""
+    }
+
+    console.log(data , alert)
+    setAlerts(msgBox)
+
+    if (msgBox.firstName == "" && msgBox.lastName == "" && msgBox.email == "" && msgBox.phNo == ""){
+      setRegistration(true)
+      showToast()
+    }
+  }
+
+  const showToast = () => {
+    toast.success('Registration Successfully', {
+      position: "top-center",
+      autoClose:2000
+    });
+  };
+
+  return (
+    <div className='form'>
+      <h1>Registration Form</h1>
+
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="">
+          <input id="FirstName" type="text" name="firstName" defaultValue={data.firstName} onChange={handleChange} placeholder='Enter your First Name' onFocus={()=>handleFocus("firstName")} style={{borderColor : focus.firstName ? "blue" : "#ccc"}}/>
+          <h3 className='alert'>{alert.firstName}</h3>
+        </label>
+
+        <label htmlFor="">
+          <input id="LastName" type="text" name="lastName" defaultValue={data.lastName} onChange={handleChange} placeholder='Enter your Last Name'  onFocus={()=>handleFocus("lastName")} style={{borderColor : focus.lastName ? "blue" : "#ccc"}}/>
+          <h3 className='alert'>{alert.lastName}</h3>
+        </label>
+
+        <label htmlFor="">
+          <input id="email" type="email" name="email" defaultValue={data.email} onChange={handleChange} placeholder='Enter your Email'  onFocus={()=>handleFocus("email")} style={{borderColor : focus.email ? "blue" : "#ccc"}}/>
+          <h3 className='alert'>{alert.email}</h3>
+        </label>
+        
+        <label htmlFor="">
+          <input id="phno" type="number" name="phNo" defaultValue={data.phNo} onChange={handleChange} placeholder='Enter your Phone Number'  onFocus={()=>handleFocus("phNo")} style={{borderColor : focus.phNo ? "blue" : "#ccc"}}/>
+          <h3 className='alert'>{alert.phNo}</h3>
+        </label>
+
+        <input type="submit" value={"Register"} style={{backgroundColor: "Green" , color:"white" ,  border:"none" , fontSize:"18px" , borderRadius:"2px" , padding:"10px", height:"auto" , cursor:"pointer"}}/>  
+
+      </form>
+
+      
+      <ToastContainer />
+
+
+    </div>
+  )
+}
+
+export default Form
